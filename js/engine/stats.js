@@ -14,13 +14,15 @@ function getCalculatedMiningDMG() {
 
     // Equipment Items DMG Additions
     if (state.items.item_torch) dmg += 5;
-    if (state.items.item_drill) dmg += 25;
-    if (state.items.item_nano_glove) dmg += 15;
-    if (state.items.item_overclock) dmg += 10;
-    if (state.items.item_god_pickaxe) dmg += 100;
-    if (state.items.item_hyper_drill) dmg += 300;
+    if (state.items.item_drill) dmg += 30;              // 25 -> 30
+    if (state.items.item_nano_glove) dmg += 8000;        // 15 -> 8000
+    if (state.items.item_overclock) dmg += 45000;        // 10 -> 45000
+    if (state.items.item_dynamite) dmg += 1200;           // 신규 추가
+    if (state.items.item_ether_radar) dmg += 200000;      // 신규 추가
+    if (state.items.item_alchemy_bag) dmg += 800000;      // 신규 추가
+    if (state.items.item_god_pickaxe) dmg += 2500000;     // 100 -> 2500000
+    if (state.items.item_hyper_drill) dmg += 10000000;    // 300 -> 10000000
 
-    // Ether perk multiplier (50% nerfed)
     if (state.etherPerks.ether_dmg) {
         dmg = Math.floor(dmg * (1 + state.etherPerks.ether_dmg * 0.25));
     }
@@ -29,8 +31,8 @@ function getCalculatedMiningDMG() {
 
 function getMaxBagCapacity() {
     let cap = 20 + (state.upgrades.bag * 10);
-    if (state.items.item_magnet) cap += 15;
-    if (state.items.item_alchemy_bag) cap += 30;
+    if (state.items.item_magnet) cap += 20; 
+    if (state.items.item_alchemy_bag) cap += 50;
 
     if (state.etherPerks.ether_bag) {
         cap += state.etherPerks.ether_bag * 10;
