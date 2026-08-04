@@ -3,12 +3,11 @@
 
 // Shop Upgrades Definition
 const SHOP_UPGRADES = [
-    { id: "bag", name: "가방 용량 확장", desc: "광물을 저장하는 인벤토리의 최대 칸 수를 늘립니다.", baseCost: 50, costMult: 2.1, effect: 10, unit: "칸" },
-    { id: "dmg", name: "채굴력 강화", desc: "블록 타격 시 가하는 채굴 데미지를 증가시킵니다.", baseCost: 30, costMult: 1.85, effect: 3, unit: "DMG" },
-    { id: "speed", name: "이동 속도 강화 (최대 5Lv)", desc: "기본 이동 속도를 증가시킵니다. (기본 5.0 -> 최대 10.0/초)", baseCost: 100, costMult: 2.5, maxLv: 5, effect: 1.0, unit: "/초" },
-    { id: "sellPrice", name: "판매 수수료 우대", desc: "광물 매각 시 받는 골드 가격을 배율로 증가시킵니다.", baseCost: 150, costMult: 2.4, effect: 0.25, unit: "x" }
+    { id: "bag", name: "가방 용량 확장", desc: "광물을 저장하는 인벤토리의 최대 칸 수를 늘립니다.", baseCost: 60, costMult: 1.55, effect: 10, unit: "칸" },
+    { id: "dmg", name: "채굴력 강화", desc: "블록 타격 시 가하는 채굴 데미지를 증가시킵니다.", baseCost: 50, costMult: 1.45, effect: 2, unit: "DMG" },
+    { id: "speed", name: "이동 속도 강화 (최대 5Lv)", desc: "기본 이동 속도를 증가시킵니다. (기본 5.0 -> 최대 10.0/초)", baseCost: 150, costMult: 2.2, maxLv: 5, effect: 1.0, unit: "/초" },
+    { id: "sellPrice", name: "판매 수수료 우대", desc: "광물 매각 시 받는 골드 가격을 배율로 증가시킵니다.", baseCost: 200, costMult: 1.6, effect: 0.25, unit: "x" }
 ];
-
 // Expanded 13 Unique Equipment Items (1~20구역 진도 곡선에 맞춘 스케일링)
 const SHOP_ITEMS = [
     { id: "item_torch", name: "고성능 횃불", desc: "광산 시야 확보용 횃불. 보유 시 채굴 데미지 +5 증가.", price: 200 },
