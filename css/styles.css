@@ -1,0 +1,54 @@
+/* ASCII CAVE - 전역 스타일 (Tailwind 유틸리티 외 커스텀 CSS) */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap');
+
+* {
+    font-family: 'JetBrains Mono', monospace;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Clean Modern Terminal Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+.terminal-border {
+    border: 1px solid #334155;
+}
+.terminal-box {
+    background-color: #0f172a;
+    border: 1px solid #1e293b;
+}
+.terminal-btn {
+    background-color: #1e293b;
+    color: #f8fafc;
+    border: 1px solid #475569;
+    transition: all 0.15s ease-in-out;
+}
+.terminal-btn:hover:not(:disabled) {
+    background-color: #334155;
+    border-color: #38bdf8;
+    color: #38bdf8;
+}
+.terminal-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Modal backdrop Blur */
+.modal-backdrop {
+    background-color: rgba(2, 6, 23, 0.85);
+    backdrop-filter: blur(4px);
+}

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII CAVE - Extended Edition</title>
+    <!-- Favicon fallback -->
+    <link rel="icon" href="data:,">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PixiJS CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+    <!-- 커스텀 스타일 (모듈화됨) -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-200 h-screen overflow-hidden flex flex-col">
+
+    <!-- Top Header Navigation Panel -->
+    <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between z-10 shrink-0">
+        <!-- Left Title & Navigation Buttons -->
+        <div class="flex items-center space-x-3">
+            <h1 class="text-base sm:text-lg font-extrabold text-slate-100 tracking-wider flex items-center gap-1.5">
+                <span class="text-sky-400">&gt;</span> ASCII CAVE
+            </h1>
+            <button id="btn-return-lobby" class="hidden terminal-btn px-2.5 py-1 rounded text-xs font-bold text-amber-400 border-amber-500/50 hover:border-amber-400 flex items-center gap-1">
+                <span>[&larr;]</span> 로비
+            </button>
+        </div>
+
+        <!-- Center Stats Display -->
+        <div class="flex items-center space-x-4 sm:space-x-6 text-xs sm:text-sm">
+            <div class="flex items-center space-x-1" title="기본 화폐">
+                <span class="text-amber-400 font-bold">$</span>
+                <span class="text-slate-400 hidden sm:inline">골드:</span>
+                <span id="stat-gold" class="font-bold text-slate-100">0</span>
+            </div>
+            <div class="flex items-center space-x-1" title="환생 화폐">
+                <span class="text-purple-400 font-bold">&yen;</span>
+                <span class="text-slate-400 hidden sm:inline">에테르:</span>
+                <span id="stat-ether" class="font-bold text-purple-300">0</span>
+            </div>
+            <div class="flex items-center space-x-1" title="채굴력">
+                <span class="text-rose-400 font-bold">&dagger;</span>
+                <span class="text-slate-400 hidden sm:inline">데미지:</span>
+                <span id="stat-dmg" class="font-bold text-slate-100">1</span>
+            </div>
+            <div class="flex items-center space-x-1" title="이동 속도">
+                <span class="text-emerald-400 font-bold">&gt;&gt;</span>
+                <span class="text-slate-400 hidden sm:inline">속도:</span>
+                <span id="stat-speed" class="font-bold text-slate-100">5.0/s</span>
+            </div>
+            <div class="flex items-center space-x-1" title="보유 장비 개수">
+                <span class="text-sky-400 font-bold">&equiv;</span>
+                <span class="text-slate-400 hidden sm:inline">장비:</span>
+                <span id="stat-item-count" class="font-bold text-slate-100">0</span>
+            </div>
+        </div>
+
+        <!-- Right Options / Controls -->
+        <div class="flex items-center space-x-2">
+            <button id="btn-settings" class="terminal-btn px-2.5 py-1 rounded text-xs">
+                [설정]
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex overflow-hidden">
+        <!-- Left Canvas Panel (Game Screen) -->
+        <section class="flex-1 flex flex-col relative bg-slate-950 p-2 overflow-hidden">
+            <!-- Sector Header Overlay -->
+            <div class="absolute top-4 left-4 z-10 bg-slate-900/90 border border-slate-700/80 rounded px-3 py-1.5 text-xs flex items-center gap-3 backdrop-blur-sm">
+                <div><span class="text-slate-400">구역:</span> <span id="sector-title" class="font-bold text-sky-400">로비 (LOBBY)</span></div>
+                <div class="text-slate-600">|</div>
+                <div><span class="text-slate-400">좌표:</span> <span id="player-coords" class="text-slate-300">X: 0, Y: 0</span></div>
+            </div>
+
+            <!-- PixiJS Container -->
+            <div id="game-canvas-container" class="w-full h-full rounded border border-slate-800 bg-slate-950 overflow-hidden flex items-center justify-center relative cursor-crosshair">
+                <!-- Pixi canvas injected here -->
+            </div>
+
+            <!-- Controls Info Footer Bar -->
+            <div class="mt-2 text-[11px] text-slate-400 flex items-center justify-between px-2">
+                <div>[WASD / 방향키] 이동 | [마우스 / 터치] 이동 및 채굴 지정</div>
+                <div>건물에 다가가면 상호작용 가능</div>
+            </div>
+        </section>
+
+        <!-- Right Sidebar Panel -->
+        <aside class="w-80 lg:w-96 bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 overflow-hidden">
+            <!-- Inventory Section -->
+            <div class="p-3 border-b border-slate-800 flex flex-col h-1/3 min-h-[180px]">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-slate-300 tracking-wide flex items-center gap-1.5">
+                        <span class="text-amber-400">[#]</span> 인벤토리
+                    </span>
+                    <span id="bag-capacity-text" class="text-xs text-slate-400 font-mono">0 / 20</span>
+                </div>
+                <!-- Capacity Progress Bar -->
+                <div class="w-full bg-slate-950 h-2 rounded border border-slate-800 overflow-hidden mb-2">
+                    <div id="bag-progress-bar" class="bg-amber-500 h-full w-0 transition-all duration-200"></div>
+                </div>
+                <!-- Inventory Items Grid/List -->
+                <div id="inventory-list" class="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1 text-xs font-mono">
+                    <div class="text-slate-500 text-center py-4">비어 있음</div>
+                </div>
+            </div>
+
+            <!-- Equipped & Owned Items Section -->
+            <div class="p-3 border-b border-slate-800 h-1/4 min-h-[140px] flex flex-col">
+                <div class="text-xs font-bold text-slate-300 tracking-wide mb-2 flex items-center gap-1.5">
+                    <span class="text-sky-400">[*]</span> 보유 특수 장비
+                </div>
+                <div id="equipment-list" class="flex-1 min-h-0 overflow-y-auto space-y-1.5 text-xs font-mono pr-1">
+                    <div class="text-slate-500 text-center py-2">소지한 특수 장비 없음</div>
+                </div>
+            </div>
+
+            <!-- Sector Information Section -->
+            <div class="p-3 border-b border-slate-800 text-xs flex flex-col">
+                <div class="font-bold text-slate-300 tracking-wide mb-1 flex items-center gap-1.5">
+                    <span class="text-emerald-400">[i]</span> 섹터 환경 정보
+                </div>
+                <div id="sector-info-desc" class="text-slate-400 text-[11px] leading-relaxed mb-2">
+                    안전지대 로비입니다. 건물을 이용할 수 있습니다.
+                </div>
+            </div>
+
+            <!-- System & Action Log Section -->
+            <div class="p-3 flex-1 flex flex-col overflow-hidden">
+                <div class="text-xs font-bold text-slate-300 tracking-wide mb-1.5 flex items-center gap-1.5">
+                    <span class="text-slate-400">[&gt;]</span> 작업 및 시스템 로그
+                </div>
+                <div id="log-box" class="flex-1 min-h-0 bg-slate-950 border border-slate-800 rounded p-2 overflow-y-auto font-mono text-[11px] space-y-1 leading-snug text-slate-300">
+                    <div class="text-slate-500">&gt; 시스템 시작 완료.</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- MODALS CONTAINER -->
+
+    <!-- 1. Entrance Sector Select Modal -->
+    <div id="modal-entrance" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+        <div class="terminal-box w-full max-w-4xl rounded-lg p-5 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h2 class="text-base font-bold text-sky-400 flex items-center gap-2">
+                    <span>[입구]</span> 광산 섹터 선택 및 입장권 구매
+                </h2>
+                <button class="btn-close-modal text-slate-400 hover:text-slate-100 text-sm font-mono">[X]</button>
+            </div>
+            <div class="text-xs text-slate-400 mb-3 flex justify-between items-center">
+                <span>입장하려면 각 동굴의 입장권 구매가 필요합니다. 상위 동굴일수록 입장권 가격이 대폭 상승합니다.</span>
+                <span class="text-amber-400 font-bold">보유 골드: <span id="entrance-modal-gold">$0</span></span>
+            </div>
+            <div id="sector-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto pr-2 flex-1 min-h-0">
+                <!-- Sector Cards generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Market / Sell Ore Modal -->
+    <div id="modal-market" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+        <div class="terminal-box w-full max-w-lg rounded-lg p-5 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
+                    <span>[판매 거래소]</span> 자원 매각
+                </h2>
+                <button class="btn-close-modal text-slate-400 hover:text-slate-100 text-sm font-mono">[X]</button>
+            </div>
+            <div id="market-sell-list" class="space-y-2 overflow-y-auto flex-1 min-h-0 pr-1 mb-4 text-xs font-mono">
+                <!-- Sell inventory items list -->
+            </div>
+            <div class="border-t border-slate-800 pt-3 flex items-center justify-between">
+                <div class="text-xs text-slate-400">
+                    총 예상 가치: <span id="market-total-value" class="text-amber-400 font-bold">$0</span>
+                </div>
+                <button id="btn-sell-all" class="terminal-btn px-4 py-2 rounded text-xs font-bold text-amber-400 border-amber-500/50">
+                    전체 매각하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Shop Modal (Upgrades & Items) -->
+    <div id="modal-shop" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+        <div class="terminal-box w-full max-w-2xl rounded-lg p-5 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h2 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                    <span>[상점]</span> 광산 종합 보급소
+                </h2>
+                <button class="btn-close-modal text-slate-400 hover:text-slate-100 text-sm font-mono">[X]</button>
+            </div>
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-800 mb-4 gap-2">
+                <button id="shop-tab-upgrades" class="px-4 py-1.5 text-xs font-bold border-b-2 border-emerald-400 text-emerald-400">기본 능력 강화</button>
+                <button id="shop-tab-items" class="px-4 py-1.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200">특수 장비 (13종)</button>
+            </div>
+            <!-- Tab Content 1: Upgrades -->
+            <div id="shop-content-upgrades" class="space-y-3 overflow-y-auto flex-1 min-h-0 pr-2">
+                <!-- Upgrades generated here -->
+            </div>
+            <!-- Tab Content 2: Items -->
+            <div id="shop-content-items" class="hidden space-y-3 overflow-y-auto flex-1 min-h-0 pr-2">
+                <!-- Items generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Altar / Rebirth Modal -->
+    <div id="modal-altar" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+        <div class="terminal-box w-full max-w-2xl rounded-lg p-5 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                <h2 class="text-base font-bold text-purple-400 flex items-center gap-2">
+                    <span>[고대의 재단]</span> 정화 및 환생
+                </h2>
+                <button class="btn-close-modal text-slate-400 hover:text-slate-100 text-sm font-mono">[X]</button>
+            </div>
+            <div class="text-xs text-slate-300 leading-relaxed mb-3 bg-purple-950/30 p-3 rounded border border-purple-900/40">
+                환생 시 골드, 일반 인벤토리 및 기본 업그레이드가 초기화되지만, 각종 성과에 따라 <span class="text-purple-300 font-bold">에테르(&yen;)</span>를 획득합니다.<br>
+                <span class="text-amber-400 font-bold">* 환생 조건: 골드 3,000개 이상 보유 또는 4구역 이상 해금</span>
+            </div>
+
+            <!-- Rebirth Calculation Breakdown Box -->
+            <div class="bg-slate-950 rounded border border-slate-800 p-3 mb-3 text-xs">
+                <div class="font-bold text-slate-300 mb-2 border-b border-slate-800 pb-1 flex justify-between">
+                    <span>[환생 예상 에테르 산출 내역]</span>
+                    <span id="rebirth-ether-total" class="text-purple-300 font-bold text-sm">+0 &yen;</span>
+                </div>
+                <div id="rebirth-breakdown-list" class="space-y-1 font-mono text-[11px] text-slate-400">
+                    <!-- Breakdown items -->
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-slate-950 p-3 rounded border border-slate-800 mb-2">
+                <div class="text-xs">
+                    <span class="text-slate-400">최종 환생 획득 에테르:</span>
+                    <span id="rebirth-ether-gain" class="text-purple-300 font-bold ml-1 text-sm">+0 &yen;</span>
+                </div>
+                <button id="btn-do-rebirth" class="terminal-btn px-4 py-2 rounded text-xs font-bold text-purple-300 border-purple-500/50 hover:bg-purple-900/40">
+                    환생 실행하기
+                </button>
+            </div>
+            <div id="rebirth-req-msg" class="text-xs text-rose-400 font-bold mb-3 hidden">
+                * 환생 조건 미충족 (골드 3,000 이상 또는 4구역 이상 해금 필요)
+            </div>
+
+            <!-- Perk Upgrades -->
+            <div class="text-xs font-bold text-slate-300 mb-2">[에테르 특성 영구 수련]</div>
+            <div id="altar-perks-list" class="space-y-2 overflow-y-auto flex-1 min-h-0 pr-1">
+                <!-- Ether perks generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Codex (도감) Modal -->
+    <div id="modal-codex" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+        <div class="terminal-box w-full max-w-4xl rounded-lg p-5 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                <h2 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                    <span>[광물 도감]</span> 채굴 기록 및 수집 현황
+                </h2>
+                <button class="btn-close-modal text-slate-400 hover:text-slate-100 text-sm font-mono">[X]</button>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="flex items-center justify-between bg-slate-950 p-3 rounded border border-slate-800 mb-3 text-xs">
+                <div>
+                    <span class="text-slate-400">전체 발견 광석: </span>
+                    <span id="codex-stat-discovered" class="font-bold text-emerald-400">0 / 0</span>
+                </div>
+                <div>
+                    <span class="text-slate-400">총 채굴한 광석 수: </span>
+                    <span id="codex-stat-total-mined" class="font-bold text-amber-400">0개</span>
+                </div>
+            </div>
+
+            <!-- Sector Filter Buttons Bar -->
+            <div id="codex-sector-filters" class="flex gap-1 overflow-x-auto shrink-0 pb-2 mb-3 text-xs font-mono">
+                <!-- Sector tabs created dynamically -->
+            </div>
+
+            <!-- Codex Ores Grid -->
+            <div id="codex-ores-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 overflow-y-auto flex-1 min-h-0 pr-1 text-xs">
+                <!-- Ore codex cards generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Settings / Reset Modal -->
+    <div id="modal-settings" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+        <div class="terminal-box w-full max-w-md rounded-lg p-5 flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h2 class="text-base font-bold text-slate-200">설정 &amp; 데이터 관리</h2>
+                <button class="btn-close-modal text-slate-400 hover:text-slate-100 text-sm font-mono">[X]</button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <button id="btn-save-game" class="w-full terminal-btn py-2 rounded font-bold text-sky-400">
+                    수동 저장 (자동 저장 활성화됨)
+                </button>
+                <button id="btn-reset-game" class="w-full terminal-btn py-2 rounded font-bold text-rose-400 border-rose-500/40 hover:bg-rose-950/40">
+                    데이터 초기화 (전체 리셋)
+                </button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
