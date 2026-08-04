@@ -3,6 +3,7 @@ import { state } from '../state.js';
 import { getCalculatedSpeed } from './stats.js';
 import { hideTargetMarker } from './renderer.js';
 import { tryMovePlayer, handleDroneMining } from './mining.js';
+import { tickSkillCooldowns, activateSkill } from './skills.js';
 
 /* Main Game Loop */
 let lastTime = performance.now();
@@ -34,6 +35,7 @@ function gameLoop(now) {
     }
 
     handleDroneMining(deltaSec);
+    tickSkillCooldowns(deltaSec);
     requestAnimationFrame(gameLoop);
 }
 
@@ -61,7 +63,16 @@ function processKeyboardInput() {
 
 function setupKeyboardListeners() {
     window.addEventListener('keydown', (e) => {
-        activeKeys[e.key.toLowerCase()] = true;
+        const key = e.key.toLowerCase();
+        activeKeys[key] = true;
+
+        // 액티브 스킬 발동 핫키 (1: 충격파, 2: 질주, 3: 재물의 축복)
+        if (key === '1' || key === '2' || key === '3') {
+            const skillIdByKey = { '1': 'skill_shockwave', '2': 'skill_haste', '3': 'skill_fortune' };
+            activateSkill(skillIdByKey[key]);
+            return;
+        }
+
         processKeyboardInput();
     });
     window.addEventListener('keyup', (e) => {

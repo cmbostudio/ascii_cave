@@ -5,6 +5,7 @@ import { getInventoryCount, getMaxBagCapacity, getCalculatedMiningDMG } from './
 import { addLog } from '../ui/log.js';
 import { updateInventoryUI } from '../ui/inventory.js';
 import { triggerBuildingInteraction } from '../ui/interactions.js';
+import { getSkillCritChance, getSkillLuckChance } from './skills.js';
 
 function tryMovePlayer(dx, dy) {
     const newX = state.player.x + dx;
@@ -42,9 +43,10 @@ function mineOreBlock(x, y, cell) {
 
     let dmg = getCalculatedMiningDMG();
 
-    // Check Critical Chance from Nano Glove
+    // Check Critical Chance from Nano Glove + [정밀 타격] 패시브 스킬 (합산 확률)
     let isCrit = false;
-    if (state.items.item_nano_glove && Math.random() < 0.15) {
+    const critChance = (state.items.item_nano_glove ? 0.15 : 0) + getSkillCritChance();
+    if (critChance > 0 && Math.random() < critChance) {
         dmg *= 2;
         isCrit = true;
     }
@@ -93,10 +95,17 @@ function obtainOre(oreData) {
     const maxCap = getMaxBagCapacity();
 
     if (currentCap < maxCap) {
-        state.inventory[oreData.name] = (state.inventory[oreData.name] || 0) + 1;
-        state.stats.totalMined[oreData.name] = (state.stats.totalMined[oreData.name] || 0) + 1;
+        // [행운의 손] 패시브 스킬: 확률적으로 1개 추가 획득 (가방 여유 칸만큼)
+        let gainAmount = 1;
+        if (Math.random() < getSkillLuckChance() && currentCap + 1 < maxCap) {
+            gainAmount = 2;
+        }
 
-        addLog(`<span class="text-emerald-400">[채굴 성공] ${oreData.name} 획득! (총 채굴: ${state.stats.totalMined[oreData.name]}개)</span>`);
+        state.inventory[oreData.name] = (state.inventory[oreData.name] || 0) + gainAmount;
+        state.stats.totalMined[oreData.name] = (state.stats.totalMined[oreData.name] || 0) + gainAmount;
+
+        const luckTxt = gainAmount > 1 ? `<span class="text-amber-300 font-bold">[행운!]</span> ` : '';
+        addLog(`${luckTxt}<span class="text-emerald-400">[채굴 성공] ${oreData.name} 획득! (총 채굴: ${state.stats.totalMined[oreData.name]}개)</span>`);
         updateInventoryUI();
     }
 }

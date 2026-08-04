@@ -82,7 +82,7 @@
 
             <!-- Controls Info Footer Bar -->
             <div class="mt-2 text-[11px] text-slate-400 flex items-center justify-between px-2">
-                <div>[WASD / 방향키] 이동 | [마우스 / 터치] 이동 및 채굴 지정</div>
+                <div>[WASD / 방향키] 이동 | [마우스 / 터치] 이동 및 채굴 지정 | [1][2][3] 액티브 스킬 발동</div>
                 <div>건물에 다가가면 상호작용 가능</div>
             </div>
         </section>
@@ -254,7 +254,35 @@
         </div>
     </div>
 
-    <!-- 5. Codex (도감) Modal -->
+    <!-- 5. Skill Modal (Passive & Active Skills) -->
+    <div id="modal-skill" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+        <div class="terminal-box w-full max-w-2xl rounded-lg p-5 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h2 class="text-base font-bold text-rose-400 flex items-center gap-2">
+                    <span>[스킬]</span> 채굴자 수련소
+                </h2>
+                <button class="btn-close-modal text-slate-400 hover:text-slate-100 text-sm font-mono">[X]</button>
+            </div>
+            <div class="text-[11px] text-slate-400 mb-3">
+                액티브 스킬은 해금 후 <span class="text-slate-200 font-bold">광산 구역</span>에서 숫자키 <span class="text-rose-300 font-bold">[1] [2] [3]</span>으로 발동할 수 있습니다.
+            </div>
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-800 mb-4 gap-2">
+                <button id="skill-tab-passives" class="px-4 py-1.5 text-xs font-bold border-b-2 border-rose-400 text-rose-400">패시브 스킬</button>
+                <button id="skill-tab-actives" class="px-4 py-1.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200">액티브 스킬</button>
+            </div>
+            <!-- Tab Content 1: Passives -->
+            <div id="skill-content-passives" class="space-y-3 overflow-y-auto flex-1 min-h-0 pr-2">
+                <!-- Passive skills generated here -->
+            </div>
+            <!-- Tab Content 2: Actives -->
+            <div id="skill-content-actives" class="hidden space-y-3 overflow-y-auto flex-1 min-h-0 pr-2">
+                <!-- Active skills generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Codex (도감) Modal -->
     <div id="modal-codex" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
         <div class="terminal-box w-full max-w-4xl rounded-lg p-5 flex flex-col max-h-[85vh]">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
@@ -288,7 +316,7 @@
         </div>
     </div>
 
-    <!-- 6. Settings / Reset Modal -->
+    <!-- 7. Settings / Reset Modal -->
     <div id="modal-settings" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
         <div class="terminal-box w-full max-w-md rounded-lg p-5 flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">

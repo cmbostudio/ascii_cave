@@ -33,6 +33,7 @@ function generateMap(sectorId) {
         placeBuilding(grid, 3, 13, 'B', '상 점', '#10b981', 'SHOP');
         placeBuilding(grid, 19, 13, 'A', '재 단', '#c084fc', 'ALTAR');
         placeBuilding(grid, 11, 2, 'D', '도 감', '#34d399', 'CODEX');
+        placeBuilding(grid, 11, 15, 'K', '스 킬', '#fb7185', 'SKILL');
 
     } else {
         // CAVERN MAP GENERATION FOR SECTORS 1~20

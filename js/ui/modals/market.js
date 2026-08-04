@@ -3,6 +3,7 @@ import { state } from '../../state.js';
 import { SECTOR_DATA } from '../../data/sectors.js';
 import { addLog } from '../log.js';
 import { updateUIHeaderAndInfo } from '../header.js';
+import { isFortuneActive } from '../../engine/skills.js';
 
 function openMarketModal() {
     const listEl = document.getElementById('market-sell-list');
@@ -13,6 +14,7 @@ function openMarketModal() {
     if (state.items.item_scanner) multiplier += 0.5;
     if (state.items.item_alchemy_bag) multiplier += 0.3;
     if (state.etherPerks.ether_price) multiplier += state.etherPerks.ether_price * 0.5;
+    if (isFortuneActive()) multiplier *= 2; // [재물의 축복] 액티브 스킬: 판매가 2배
 
     let hasItemToSell = false;
     for (let oreName in state.inventory) {

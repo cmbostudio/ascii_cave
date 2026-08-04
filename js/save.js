@@ -13,7 +13,8 @@ function saveGame() {
             items: state.items,
             etherPerks: state.etherPerks,
             inventory: state.inventory,
-            stats: state.stats
+            stats: state.stats,
+            skills: state.skills
         };
         localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     } catch (e) {
@@ -34,6 +35,10 @@ function loadGame() {
             state.etherPerks = data.etherPerks || { ether_dmg: 0, ether_bag: 0, ether_price: 0 };
             state.inventory = data.inventory || {};
             state.stats = data.stats || { totalMined: {}, totalGoldEarned: 0, totalRebirths: 0, deepestSectorUnlocked: 1 };
+            state.skills = data.skills || {
+                passives: { skill_crit: 0, skill_luck: 0, skill_cooldown: 0 },
+                activeUnlocked: { skill_shockwave: false, skill_haste: false, skill_fortune: false }
+            };
         }
     } catch (e) {
         console.error("Load failed:", e);

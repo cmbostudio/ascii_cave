@@ -1,11 +1,13 @@
 // 플레이어 스탯 & 장비 효과 계산 (속도, 채굴력, 가방 용량 등)
 import { state } from '../state.js';
+import { isHasteActive } from './skills.js';
 
 function getCalculatedSpeed() {
     let speed = state.player.baseSpeed + (state.upgrades.speed * 1.0);
     if (state.items.item_boots) speed += 2.0;
     if (state.items.item_overclock) speed += 3.0;
     if (state.items.item_god_pickaxe) speed += 1.5;
+    if (isHasteActive()) speed *= 2.0; // [질주의 바람] 액티브 스킬: 이동 속도 2배
     return speed;
 }
 

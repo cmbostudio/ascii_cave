@@ -4,6 +4,7 @@ import { openMarketModal } from './modals/market.js';
 import { openShopModal } from './modals/shop.js';
 import { openAltarModal } from './modals/altar.js';
 import { openCodexModal } from './modals/codex.js';
+import { openSkillModal } from './modals/skill.js';
 
 function triggerBuildingInteraction(buildingType) {
     if (buildingType === 'ENTRANCE') openEntranceModal();
@@ -11,6 +12,7 @@ function triggerBuildingInteraction(buildingType) {
     else if (buildingType === 'SHOP') openShopModal();
     else if (buildingType === 'ALTAR') openAltarModal();
     else if (buildingType === 'CODEX') openCodexModal();
+    else if (buildingType === 'SKILL') openSkillModal();
 }
 
 export { triggerBuildingInteraction };

@@ -43,6 +43,28 @@ function setupEventListeners() {
         };
     }
 
+    // Skill Tabs
+    const tabSkillPassive = document.getElementById('skill-tab-passives');
+    const tabSkillActive = document.getElementById('skill-tab-actives');
+    const contentSkillPassive = document.getElementById('skill-content-passives');
+    const contentSkillActive = document.getElementById('skill-content-actives');
+
+    if (tabSkillPassive && tabSkillActive) {
+        tabSkillPassive.onclick = () => {
+            tabSkillPassive.className = "px-4 py-1.5 text-xs font-bold border-b-2 border-rose-400 text-rose-400";
+            tabSkillActive.className = "px-4 py-1.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200";
+            contentSkillPassive.classList.remove('hidden');
+            contentSkillActive.classList.add('hidden');
+        };
+
+        tabSkillActive.onclick = () => {
+            tabSkillActive.className = "px-4 py-1.5 text-xs font-bold border-b-2 border-rose-400 text-rose-400";
+            tabSkillPassive.className = "px-4 py-1.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200";
+            contentSkillActive.classList.remove('hidden');
+            contentSkillPassive.classList.add('hidden');
+        };
+    }
+
     // Save & Reset Buttons
     document.getElementById('btn-save-game').onclick = () => {
         saveGame();

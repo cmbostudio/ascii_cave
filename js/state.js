@@ -24,6 +24,24 @@ const state = {
         ether_bag: 0,
         ether_price: 0
     },
+    skills: {
+        passives: {
+            skill_crit: 0,
+            skill_luck: 0,
+            skill_cooldown: 0
+        },
+        activeUnlocked: {
+            skill_shockwave: false,
+            skill_haste: false,
+            skill_fortune: false
+        }
+    },
+    // 런타임 전용 (저장하지 않음): 액티브 스킬 쿨다운 및 지속효과 타이머
+    activeSkillRuntime: {
+        cooldowns: {},   // skillId -> 남은 쿨다운(초)
+        hasteUntil: 0,   // performance.now() 기준 만료 시각(ms)
+        fortuneUntil: 0
+    },
     inventory: {}, // oreName -> count in bag
     stats: {
         totalMined: {}, // oreName -> total cumulative count mined
