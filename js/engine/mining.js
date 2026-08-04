@@ -119,8 +119,8 @@ function handleDroneMining(deltaSec) {
             if (nx >= 0 && nx < state.mapWidth && ny >= 0 && ny < state.mapHeight) {
                 const cell = state.mapGrid[ny][nx];
                 if (cell.type === 'ORE') {
-                    cell.hp -= 5;
-                    addLog(`<span class="text-sky-300">[드론] 주변 ${cell.oreData.name} 타격! (-5 HP)</span>`);
+                    cell.hp -= 150; 
+                    addLog(`<span class="text-sky-300">[드론] 주변 ${cell.oreData.name} 타격! (-150 HP)</span>`);
                     if (cell.hp <= 0) {
                         obtainOre(cell.oreData);
                         state.mapGrid[ny][nx] = { char: '.', type: 'FLOOR', color: '#1e293b' };
